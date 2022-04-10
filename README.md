@@ -17,5 +17,5 @@ por ps <PORT>
 停止
 
 ```
-por ps <PORT>
+por stop <PORT>
 ```
