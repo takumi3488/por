@@ -14,8 +14,10 @@ idではなくポートでdockerコンテナを指定して操作したい場面
 por ps <PORT>
 ```
 
-停止
+コンテナ名変更
 
 ```
-por stop <PORT>
+por rename <PORT> <NAME>
 ```
+
+その他`logs`,`pause`,`restart`,`stop`,`unpause`が使えます。

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/takumi3488/por/cmd"
 )
 
 func main() {
@@ -29,13 +29,13 @@ func main() {
 
 	flag.Parse()
 	args := flag.Args()
-	cmd := args[0]
+	opt := args[0]
 	port, err := strconv.Atoi(args[1])
 	if err != nil {
 		panic(err)
 	}
 
-	switch cmd {
+	switch opt {
 	case "ps":
 		fmt.Fprintln(w, "CONTAINER ID\tIMAGE\tCOMMAND\tSTATUS\tPORTS\tNAMES")
 	}
@@ -51,22 +51,21 @@ func main() {
 
 	}
 	for _, c := range filteredContainers {
-		switch cmd {
+		switch opt {
+		case "logs":
+			cmd.Logs(cli, ctx, c.ID)
+		case "pause":
+			cmd.Pause(cli, ctx, c.ID)
 		case "ps":
-			ports := ""
-			for _, p := range c.Ports {
-				ports += fmt.Sprintf("%s:%d->%d/%s, ", p.IP, p.PrivatePort, p.PrivatePort, p.Type)
-			}
-			names := ""
-			for _, n := range c.Names {
-				names += fmt.Sprintf("%s, ", n)
-			}
-			fmt.Fprintf(w, "%v\t%v\t\"%v\"\t%v\t%v\t%v\n", c.ID[0:12], c.Image, c.Command, c.Status, strings.TrimRight(ports, ", "), strings.TrimRight(names, ", "))
+			cmd.Ps(w, c)
+		case "rename":
+			cmd.Rename(cli, ctx, c.ID, args[2])
+		case "restart":
+			cmd.Restart(cli, ctx, c.ID)
 		case "stop":
-			if err := cli.ContainerStop(ctx, c.ID, nil); err != nil {
-				panic(err)
-			}
-			fmt.Println(c.ID[0:12])
+			cmd.Stop(cli, ctx, c.ID)
+		case "unpause":
+			cmd.Unpause(cli, ctx, c.ID)
 		}
 	}
 	w.Flush()
