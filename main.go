@@ -48,7 +48,6 @@ func main() {
 				break
 			}
 		}
-
 	}
 	for _, c := range filteredContainers {
 		switch opt {
